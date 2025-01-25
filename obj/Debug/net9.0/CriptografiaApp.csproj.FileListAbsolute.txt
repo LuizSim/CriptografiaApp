@@ -1,0 +1,14 @@
+C:\Users\luiza\OneDrive\Área de Trabalho\Projetos\criptografia\CriptografiaApp\bin\Debug\net9.0\CriptografiaApp.exe
+C:\Users\luiza\OneDrive\Área de Trabalho\Projetos\criptografia\CriptografiaApp\bin\Debug\net9.0\CriptografiaApp.deps.json
+C:\Users\luiza\OneDrive\Área de Trabalho\Projetos\criptografia\CriptografiaApp\bin\Debug\net9.0\CriptografiaApp.runtimeconfig.json
+C:\Users\luiza\OneDrive\Área de Trabalho\Projetos\criptografia\CriptografiaApp\bin\Debug\net9.0\CriptografiaApp.dll
+C:\Users\luiza\OneDrive\Área de Trabalho\Projetos\criptografia\CriptografiaApp\bin\Debug\net9.0\CriptografiaApp.pdb
+C:\Users\luiza\OneDrive\Área de Trabalho\Projetos\criptografia\CriptografiaApp\obj\Debug\net9.0\CriptografiaApp.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\luiza\OneDrive\Área de Trabalho\Projetos\criptografia\CriptografiaApp\obj\Debug\net9.0\CriptografiaApp.AssemblyInfoInputs.cache
+C:\Users\luiza\OneDrive\Área de Trabalho\Projetos\criptografia\CriptografiaApp\obj\Debug\net9.0\CriptografiaApp.AssemblyInfo.cs
+C:\Users\luiza\OneDrive\Área de Trabalho\Projetos\criptografia\CriptografiaApp\obj\Debug\net9.0\CriptografiaApp.csproj.CoreCompileInputs.cache
+C:\Users\luiza\OneDrive\Área de Trabalho\Projetos\criptografia\CriptografiaApp\obj\Debug\net9.0\CriptografiaApp.dll
+C:\Users\luiza\OneDrive\Área de Trabalho\Projetos\criptografia\CriptografiaApp\obj\Debug\net9.0\refint\CriptografiaApp.dll
+C:\Users\luiza\OneDrive\Área de Trabalho\Projetos\criptografia\CriptografiaApp\obj\Debug\net9.0\CriptografiaApp.pdb
+C:\Users\luiza\OneDrive\Área de Trabalho\Projetos\criptografia\CriptografiaApp\obj\Debug\net9.0\CriptografiaApp.genruntimeconfig.cache
+C:\Users\luiza\OneDrive\Área de Trabalho\Projetos\criptografia\CriptografiaApp\obj\Debug\net9.0\ref\CriptografiaApp.dll

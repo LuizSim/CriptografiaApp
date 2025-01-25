@@ -1,0 +1,4 @@
+C:\Users\luiza\OneDrive\Área de Trabalho\Projetos\CriptografiaApp\obj\Release\net9.0-windows\CriptografiaApp.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\luiza\OneDrive\Área de Trabalho\Projetos\CriptografiaApp\obj\Release\net9.0-windows\CriptografiaApp.AssemblyInfoInputs.cache
+C:\Users\luiza\OneDrive\Área de Trabalho\Projetos\CriptografiaApp\obj\Release\net9.0-windows\CriptografiaApp.AssemblyInfo.cs
+C:\Users\luiza\OneDrive\Área de Trabalho\Projetos\CriptografiaApp\obj\Release\net9.0-windows\CriptografiaApp.csproj.CoreCompileInputs.cache
