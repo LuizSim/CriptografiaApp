@@ -1,3 +1,4 @@
+using CriptografiaApp;
 using System;
 using System.IO;
 using System.Security.Cryptography;
@@ -8,9 +9,6 @@ namespace CriptografiaApp
 {
     public partial class Form1 : Form
     {
-        private const string logFilePath = "criptografia_log.txt";
-        private const string outputFilePath = "arquivos_descriptografados.txt";
-
         public Form1()
         {
             InitializeComponent();
@@ -18,6 +16,13 @@ namespace CriptografiaApp
 
         private void btnGerarChave_Click(object sender, EventArgs e)
         {
+            string senha = Microsoft.VisualBasic.Interaction.InputBox("Digite uma senha para proteger a chave:", "Definir Senha", "");
+            if (string.IsNullOrEmpty(senha))
+            {
+                MessageBox.Show("Senha não pode ser vazia.");
+                return;
+            }
+
             SaveFileDialog saveFileDialog = new SaveFileDialog
             {
                 Filter = "Key Files (*.key)|*.key",
@@ -28,9 +33,16 @@ namespace CriptografiaApp
             {
                 using (Aes aes = Aes.Create())
                 {
-                    File.WriteAllBytes(saveFileDialog.FileName, aes.Key);
-                    MessageBox.Show($"Chave salva em '{saveFileDialog.FileName}'.");
-                    RegistrarLog("Chave gerada", saveFileDialog.FileName, "N/A");
+                    byte[] salt = GenerateSalt();
+                    byte[] chaveDerivada = DerivarChave(senha, salt);
+
+                    using (FileStream fs = new FileStream(saveFileDialog.FileName, FileMode.Create))
+                    {
+                        fs.Write(salt, 0, salt.Length);
+                        fs.Write(chaveDerivada, 0, chaveDerivada.Length);
+                    }
+
+                    MessageBox.Show($"Chave protegida por senha salva em '{saveFileDialog.FileName}'.");
                 }
             }
         }
@@ -51,17 +63,10 @@ namespace CriptografiaApp
 
         private void btnCriptografar_Click(object sender, EventArgs e)
         {
-            if (string.IsNullOrEmpty(txtChave.Text) || !File.Exists(txtChave.Text))
-            {
-                MessageBox.Show("Por favor, selecione uma chave válida.");
-                return;
-            }
+            byte[] chave = ObterChave();
+            if (chave == null) return;
 
-            OpenFileDialog openFileDialog = new OpenFileDialog
-            {
-                Title = "Selecione o arquivo para criptografar"
-            };
-
+            OpenFileDialog openFileDialog = new OpenFileDialog { Title = "Selecione o arquivo para criptografar" };
             if (openFileDialog.ShowDialog() == DialogResult.OK)
             {
                 SaveFileDialog saveFileDialog = new SaveFileDialog
@@ -69,28 +74,20 @@ namespace CriptografiaApp
                     Filter = "Arquivo Criptografado (*.enc)|*.enc",
                     Title = "Salvar arquivo criptografado"
                 };
-
                 if (saveFileDialog.ShowDialog() == DialogResult.OK)
                 {
-                    byte[] chave = File.ReadAllBytes(txtChave.Text);
                     byte[] dados = File.ReadAllBytes(openFileDialog.FileName);
                     byte[] dadosCriptografados = CriptografarDados(dados, chave);
-
                     File.WriteAllBytes(saveFileDialog.FileName, dadosCriptografados);
                     MessageBox.Show("Arquivo criptografado com sucesso!");
-
-                    RegistrarLog("Arquivo criptografado", openFileDialog.FileName, Convert.ToBase64String(dados));
                 }
             }
         }
 
         private void btnDescriptografar_Click(object sender, EventArgs e)
         {
-            if (string.IsNullOrEmpty(txtChave.Text) || !File.Exists(txtChave.Text))
-            {
-                MessageBox.Show("Por favor, selecione uma chave válida.");
-                return;
-            }
+            byte[] chave = ObterChave();
+            if (chave == null) return;
 
             OpenFileDialog openFileDialog = new OpenFileDialog
             {
@@ -100,29 +97,41 @@ namespace CriptografiaApp
 
             if (openFileDialog.ShowDialog() == DialogResult.OK)
             {
-                byte[] chave = File.ReadAllBytes(txtChave.Text);
                 byte[] dadosCriptografados = File.ReadAllBytes(openFileDialog.FileName);
                 byte[] dadosDescriptografados = DescriptografarDados(dadosCriptografados, chave);
 
-                SaveFileDialog saveFileDialog = new SaveFileDialog
-                {
-                    Title = "Salvar arquivo descriptografado"
-                };
-
+                SaveFileDialog saveFileDialog = new SaveFileDialog { Title = "Salvar arquivo descriptografado" };
                 if (saveFileDialog.ShowDialog() == DialogResult.OK)
                 {
                     File.WriteAllBytes(saveFileDialog.FileName, dadosDescriptografados);
                     MessageBox.Show("Arquivo descriptografado com sucesso!");
-                    RegistrarLog("Arquivo descriptografado", openFileDialog.FileName, Convert.ToBase64String(dadosDescriptografados));
-                    SalvarDescriptografia(saveFileDialog.FileName, dadosDescriptografados);
                 }
             }
         }
 
-        private void RegistrarLog(string operacao, string arquivo, string conteudo)
+        private byte[] ObterChave()
         {
-            string logMensagem = $"[{DateTime.Now}] {operacao} - Arquivo: {arquivo} - Conteúdo (Base64): {conteudo}\n";
-            File.AppendAllText(logFilePath, logMensagem);
+            if (string.IsNullOrEmpty(txtChave.Text) || !File.Exists(txtChave.Text))
+            {
+                MessageBox.Show("Por favor, selecione uma chave válida.");
+                return null;
+            }
+
+            string senha = Microsoft.VisualBasic.Interaction.InputBox("Digite a senha da chave:", "Autenticação", "");
+            byte[] chaveArmazenada = File.ReadAllBytes(txtChave.Text);
+            byte[] salt = new byte[16];
+            Array.Copy(chaveArmazenada, salt, salt.Length);
+            byte[] chaveDerivada = DerivarChave(senha, salt);
+
+            for (int i = 0; i < 32; i++)
+            {
+                if (chaveArmazenada[16 + i] != chaveDerivada[i])
+                {
+                    MessageBox.Show("Senha incorreta.");
+                    return null;
+                }
+            }
+            return chaveDerivada;
         }
 
         private byte[] CriptografarDados(byte[] dados, byte[] chave)
@@ -151,7 +160,6 @@ namespace CriptografiaApp
                 byte[] iv = new byte[16];
                 Array.Copy(dados, iv, iv.Length);
                 aes.IV = iv;
-
                 using (MemoryStream ms = new MemoryStream(dados, 16, dados.Length - 16))
                 using (CryptoStream cs = new CryptoStream(ms, aes.CreateDecryptor(), CryptoStreamMode.Read))
                 using (MemoryStream output = new MemoryStream())
@@ -162,10 +170,15 @@ namespace CriptografiaApp
             }
         }
 
-        private void SalvarDescriptografia(string caminhoArquivo, byte[] dados)
+        private byte[] GenerateSalt() => RandomNumberGenerator.GetBytes(16);
+
+        private byte[] DerivarChave(string senha, byte[] salt)
         {
-            string conteudo = Encoding.UTF8.GetString(dados);
-            File.AppendAllText(outputFilePath, $"Arquivo: {caminhoArquivo}\n{conteudo}\n\n");
+            using (var pbkdf2 = new Rfc2898DeriveBytes(senha, salt, 100000, HashAlgorithmName.SHA256))
+            {
+                return pbkdf2.GetBytes(32);
+            }
         }
+
     }
 }
